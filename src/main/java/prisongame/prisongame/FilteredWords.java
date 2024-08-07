@@ -72,17 +72,19 @@ public class FilteredWords {
                 "5333187573779", // Report or Appeal dropdown
                 "report_user",
                 "360022850354", // Minehut Server Name,
-                "PrisonButBad",
+                PrisonGame.brand,
                 "13297886460307", // Minehut Server ID
                 "652d32ec45e32f2364aab056",
                 URLEncoder.encode(String.format(
                         """
-                        User '%s' was using slurs on PrisonButBad.
-                        They have already been punished on PrisonButBad.
+                        User '%s' was using slurs on %s.
+                        They have already been punished on %s.
                                                 
                         Time: %s
                         """.trim(),
                         violator.getName(),
+                        PrisonGame.brand,
+                        PrisonGame.brand,
                         now,
                         now.toEpochMilli()), StandardCharsets.UTF_8)
         ), "Report User");

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands as Command
 import net.dv8tion.jda.api.requests.GatewayIntent
+import prisongame.prisongame.PrisonGame
 import prisongame.prisongame.config.config
 import prisongame.prisongame.discord.listeners.Commands
 import prisongame.prisongame.discord.listeners.Messages
@@ -46,20 +47,20 @@ fun setup() {
         Command.slash("players", "List online players."),
         Command.slash("link", "Link your Minecraft and Discord accounts.")
             .addOption(OptionType.INTEGER, "code", "The link code.", true),
-        Command.slash("ban", "Ban players from PrisonButBad.")
+        Command.slash("ban", "Ban players from ${PrisonGame.brand}.")
             .addOption(OptionType.STRING, "player", "The player to ban.", true, true)
             .addOption(OptionType.STRING, "duration", "The ban duration.", true)
             .addOption(OptionType.STRING, "reason", "The ban reason.", false)
             .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS)),
-        Command.slash("mute", "Mute players on PrisonButBad.")
+        Command.slash("mute", "Mute players on ${PrisonGame.brand}.")
             .addOption(OptionType.STRING, "player", "The player to mute.", true, true)
             .addOption(OptionType.STRING, "duration", "The mute duration.", true)
             .addOption(OptionType.STRING, "reason", "The mute reason.", false)
             .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS)),
-        Command.slash("unban", "Unban players from PrisonButBad.")
+        Command.slash("unban", "Unban players from ${PrisonGame.brand}.")
             .addOption(OptionType.STRING, "player", "The player to unban.", true, true)
             .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS)),
-        Command.slash("unmute", "Unmute players from PrisonButBad.")
+        Command.slash("unmute", "Unmute players from ${PrisonGame.brand}.")
             .addOption(OptionType.STRING, "player", "The player to unmute.", true, true)
             .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS))
     ).queue()

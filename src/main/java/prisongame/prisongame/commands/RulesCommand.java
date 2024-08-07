@@ -26,7 +26,10 @@ public class RulesCommand implements CommandExecutor {
         var config = getConfig().getGeneral();
         var invite = config.getDiscordInvite();
         var rules = config.getRules();
-        var header = PrisonGame.mm.deserialize("<color:#5865f2>PrisonButBad Rules</color>\n\n");
+        var header = PrisonGame.mm.deserialize(
+                "<color:#5865f2><brand> Rules</color>\n\n",
+                Placeholder.component("brand", Component.text(PrisonGame.brand))
+        );
 
         var book = Book.builder();
         var components = new ArrayList<Component>();

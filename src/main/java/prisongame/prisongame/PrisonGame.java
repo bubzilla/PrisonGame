@@ -52,6 +52,7 @@ import java.util.*;
 public final class PrisonGame extends JavaPlugin {
     public static PrisonGame instance;
     public static MiniMessage mm = MiniMessage.miniMessage();
+    public static String brand = "PrisonButBad";
     public static HashMap<Player, Double> st = new HashMap<>();
     public static HashMap<Player, Double> sp = new HashMap<>();
     public static Player warden = null;

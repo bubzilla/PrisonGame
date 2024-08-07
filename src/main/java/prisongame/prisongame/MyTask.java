@@ -3,6 +3,7 @@ package prisongame.prisongame;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -780,7 +781,7 @@ public class MyTask extends BukkitRunnable {
 
         var tab = PrisonGame.mm.deserialize("""
                 <gray>---
-                <yellow>PrisonButBad</yellow> - <white>made by agmass!</white>
+                <brand> - <white>made by agmass!</white>
                 <green>Players: <player-count></green>
                 <red><warden></red>
                 ---
@@ -796,6 +797,7 @@ public class MyTask extends BukkitRunnable {
                 <prisoners>
                 <padding>
                 """,
+                Placeholder.component("brand", Component.text(PrisonGame.brand).color(NamedTextColor.YELLOW)),
                 Placeholder.component("player-count", PrisonGame.mm.deserialize("" + Bukkit.getOnlinePlayers().size())),
                 Placeholder.component("warden", wardenDisplay),
                 Placeholder.component("guard-count", PrisonGame.mm.deserialize("" + guardCount)),
