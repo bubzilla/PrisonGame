@@ -247,7 +247,6 @@ public final class PrisonGame extends JavaPlugin {
         this.getCommand("debug").setExecutor(new DebugCommand());
         this.getCommand("rules").setExecutor(new RulesCommand());
         this.getCommand("tc").setExecutor(new TeamChatCommand());
-        this.getCommand("hello").setExecutor(new HelloCommand());
         this.getCommand("disc").setExecutor(new DiscordCommand());
         this.getCommand("unlink").setExecutor(new UnlinkCommand());
         this.getCommand("season").setExecutor(new SeasonCommand());
