@@ -7,14 +7,15 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import prisongame.prisongame.PrisonGame
 import prisongame.prisongame.lib.Role
+import prisongame.prisongame.profile.profile
 
 fun players(event: SlashCommandInteractionEvent) {
     val warden = PrisonGame.warden
     val embed = EmbedBuilder()
 
     val players = Bukkit.getOnlinePlayers()
-    val prisoners = players.filter { PrisonGame.roles[it] == Role.PRISONER }
-    val guards = players.filter { PrisonGame.roles[it] != Role.WARDEN && it !in prisoners }
+    val prisoners = players.filter { it.profile.role == Role.PRISONER }
+    val guards = players.filter { it.profile.role != Role.WARDEN && it !in prisoners }
 
     val verb = if (players.size == 1) "is" else "are"
     val noun = if (players.size == 1) "player" else "players"

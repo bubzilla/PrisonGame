@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class PlayerDropItemListener implements Listener {
     @EventHandler
@@ -37,7 +38,8 @@ public class PlayerDropItemListener implements Listener {
                          meta.getDisplayName().contains("Plumber"))))
             pseudoCancel(player, drop);
 
-        if (PrisonGame.roles.get(player) != Role.PRISONER) {
+        var profile = ProfileKt.getProfile(player);
+        if (profile.getRole() != Role.PRISONER) {
             if (!type.equals(Material.TRIPWIRE_HOOK)) {
                 pseudoCancel(player, drop);
             } else {

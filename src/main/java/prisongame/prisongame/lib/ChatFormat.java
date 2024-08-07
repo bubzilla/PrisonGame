@@ -17,6 +17,7 @@ import prisongame.prisongame.FilteredWords;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.discord.listeners.Messages;
 import prisongame.prisongame.keys.Keys;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class ChatFormat implements ChatRenderer {
     @Override
@@ -27,7 +28,8 @@ public class ChatFormat implements ChatRenderer {
             @NotNull Audience viewer
     ) {
         var plainMessage = PlainTextComponentSerializer.plainText().serialize(message);
-        var role = PrisonGame.roles.get(source);
+        var profile = ProfileKt.getProfile(source);
+        var role = profile.getRole();
         var isWarden = role == Role.WARDEN;
 
         for (var player : Bukkit.getOnlinePlayers()) {

@@ -12,6 +12,7 @@ import prisongame.prisongame.MyListener;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.keys.Keys;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class NormalCommand implements CommandExecutor {
 
@@ -20,6 +21,7 @@ public class NormalCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && PrisonGame.hardmode.get((Player) sender)) {
             Player pe = (Player) sender;
+            var profile = ProfileKt.getProfile(pe);
             if (!((Player) sender).getDisplayName().contains("SOLITARY") && !((Player) sender).hasCooldown(Material.IRON_DOOR) && !new Location(pe.getWorld(), pe.getLocation().getX(), pe.getLocation().getY() - 1, pe.getLocation().getZ()).getBlock().getType().equals(Material.RED_SAND)) {
                 Player p = (Player) sender;
                 Keys.MONEY.set(p, Keys.BACKUP_MONEY.get(p, 0.0));
@@ -29,7 +31,7 @@ public class NormalCommand implements CommandExecutor {
                         PrisonGame.warden = null;
                     }
                 }
-                PrisonGame.roles.put((Player) sender, Role.PRISONER);
+                profile.setRole(Role.PRISONER);
                 DisguiseAPI.undisguiseToAll(p);
                 PrisonGame.hardmode.put(p, false);
                 MyListener.playerJoin(p, false);

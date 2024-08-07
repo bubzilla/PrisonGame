@@ -15,6 +15,7 @@ import prisongame.prisongame.FilteredWords;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.config.filter.FilterAction;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class TeamChatCommand implements CommandExecutor {
     @Override
@@ -69,7 +70,8 @@ public class TeamChatCommand implements CommandExecutor {
     }
 
     private Role getGenericRole(Player player) {
-        Role role = PrisonGame.roles.get(player);
+        var profile = ProfileKt.getProfile(player);
+        Role role = profile.getRole();
         return role == Role.PRISONER ? Role.PRISONER : Role.GUARD;
     }
 }

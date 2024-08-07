@@ -26,6 +26,7 @@ import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.config.Prison;
 import prisongame.prisongame.lib.Role;
 import prisongame.prisongame.keys.Keys;
+import prisongame.prisongame.profile.ProfileKt;
 
 import static prisongame.prisongame.MyListener.reloadBert;
 import static prisongame.prisongame.config.ConfigKt.getConfig;
@@ -463,11 +464,12 @@ public class InventoryClickListener implements Listener {
 
     public static void switchMap(Prison prison) {
         for (Player player : Bukkit.getOnlinePlayers()) {
+            var profile = ProfileKt.getProfile(player);
             if (player.getDisplayName().contains("ASCENDING") || PrisonGame.builder.getOrDefault(player, false))
                 continue;
 
             player.teleport(prison.getPrisoner().getLocation());
-            if (PrisonGame.roles.get(player) != Role.PRISONER) {
+            if (profile.getRole() != Role.PRISONER) {
                 player.teleport(prison.getWarden().getLocation());
             }
         }
@@ -480,6 +482,7 @@ public class InventoryClickListener implements Listener {
         Bukkit.getWorld("world").getBlockAt(new Location(Bukkit.getWorld("world"),-1023,-57,-994)).setType(Material.REDSTONE_BLOCK);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            var profile = ProfileKt.getProfile(player);
             if (PrisonGame.builder.get(player))
                 continue;
 
@@ -501,7 +504,7 @@ public class InventoryClickListener implements Listener {
                 player.removePassenger(passenger);
             }
 
-            if (PrisonGame.roles.get(player) != Role.WARDEN) {
+            if (profile.getRole() != Role.WARDEN) {
                 MyListener.playerJoin(player, true);
                 player.sendTitle(ChatColor.GREEN + "New prison!", ChatColor.BOLD + prison.getName().toUpperCase());
                 continue;
@@ -521,9 +524,10 @@ public class InventoryClickListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClick4(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+        var profile = ProfileKt.getProfile(player);
 
         if (!player.getOpenInventory().getTitle().equals("Map Switch")) {
-            if (player.getGameMode().equals(GameMode.ADVENTURE) || PrisonGame.roles.get(player) != Role.WARDEN || event.isCancelled() || player.getOpenInventory().getType() == InventoryType.CRAFTING) {
+            if (player.getGameMode().equals(GameMode.ADVENTURE) || profile.getRole() != Role.WARDEN || event.isCancelled() || player.getOpenInventory().getType() == InventoryType.CRAFTING) {
                 return;
             }
             player.sendMessage(ChatColor.RED + "Wardens cannot interact with containers.");

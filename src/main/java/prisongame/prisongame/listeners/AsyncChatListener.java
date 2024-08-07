@@ -14,6 +14,7 @@ import prisongame.prisongame.config.filter.FilterAction;
 import prisongame.prisongame.discord.listeners.Messages;
 import prisongame.prisongame.lib.ChatFormat;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 import static prisongame.prisongame.config.ConfigKt.getConfig;
 
@@ -22,8 +23,9 @@ public class AsyncChatListener implements Listener {
     public void onChat(AsyncChatEvent event) {
         var message = event.message();
         var player = event.getPlayer();
-        var role = PrisonGame.roles.get(player);
-        var lastMessage = PrisonGame.word.get(player);
+        var profile = ProfileKt.getProfile(player);
+        var role = profile.getRole();
+        var lastMessage = profile.getLastMessage();
         var plainMessage = PlainTextComponentSerializer.plainText().serialize(message);
         var legacyMessage = LegacyComponentSerializer.legacyAmpersand().serialize(message).toLowerCase();
 
@@ -81,7 +83,7 @@ public class AsyncChatListener implements Listener {
         } else if (!getConfig().getDev())
             Messages.INSTANCE.onChat(player, LegacyComponentSerializer.legacyAmpersand().serialize(message));
 
-        PrisonGame.word.put(player, plainMessage);
+        profile.setLastMessage(plainMessage);
         event.renderer(new ChatFormat());
     }
 }

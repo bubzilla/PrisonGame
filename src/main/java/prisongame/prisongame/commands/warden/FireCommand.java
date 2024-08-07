@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.MyListener;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -20,7 +21,8 @@ public class FireCommand implements CommandExecutor {
         if (args.length >= 1) {
             if (Bukkit.getPlayer(args[0]) != null) {
                 Player g = Bukkit.getPlayer(args[0]);
-                if (g.isOnline() && g != sender && PrisonGame.roles.get(g) != Role.PRISONER) {
+                var profile = ProfileKt.getProfile(g);
+                if (g.isOnline() && g != sender && profile.getRole() != Role.PRISONER) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + sender.getName() + " only prison:strike");
                     Bukkit.broadcastMessage(ChatColor.GOLD + g.getName() + " was fired.");
                     MyListener.playerJoin(g, false);

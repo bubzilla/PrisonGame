@@ -44,6 +44,7 @@ import prisongame.prisongame.keys.Keys;
 import prisongame.prisongame.lib.Role;
 import prisongame.prisongame.lib.SQL;
 import prisongame.prisongame.listeners.*;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -53,20 +54,8 @@ public final class PrisonGame extends JavaPlugin {
     public static PrisonGame instance;
     public static MiniMessage mm = MiniMessage.miniMessage();
     public static String brand = "PrisonButBad";
-    public static HashMap<Player, Double> st = new HashMap<>();
-    public static HashMap<Player, Double> sp = new HashMap<>();
     public static Player warden = null;
-    public static HashMap<Player, Boolean> escaped = new HashMap<>();
-    public static HashMap<Player, Role> roles = new HashMap<>();
-    public static HashMap<Player, Integer> askType = new HashMap<>();
-    static HashMap<Player, Integer> lastward = new HashMap<>();
-    static HashMap<Player, Integer> lastward2 = new HashMap<>();
-    static HashMap<Player, Integer> wardenban = new HashMap<>();
-    public static HashMap<Player, String> word = new HashMap<>();
-    static HashMap<Player, Integer> saidcycle = new HashMap<>();
     public static Integer BBpower = 100;
-    public static HashMap<Player, String> prisonnumber = new HashMap<>();
-    static HashMap<Player, Double> wealthcycle = new HashMap<>();
     public static HashMap<Player, Integer> wardentime = new HashMap<>();
     static HashMap<Player, Integer> calls = new HashMap<>();
     public static HashMap<Player, Integer> worryachieve = new HashMap<>();
@@ -280,26 +269,27 @@ public final class PrisonGame extends JavaPlugin {
 
     public void restorePlayerRoles() {
         for (Player p : Bukkit.getOnlinePlayers()) {
+            var profile = ProfileKt.getProfile(p);
             p.setGameMode(GameMode.ADVENTURE);
             if (p.getDisplayName().contains("GUARD")) {
-                PrisonGame.roles.put(p, Role.GUARD);
+                profile.setRole(Role.GUARD);
                 p.sendMessage("RELOAD: Restored Guards");
             }
             if (p.getDisplayName().contains("NURSE")) {
-                PrisonGame.roles.put(p, Role.NURSE);
+                profile.setRole(Role.NURSE);
                 p.sendMessage("RELOAD: Restored Nurses");
             }
             if (p.getDisplayName().contains("SWAT")) {
-                PrisonGame.roles.put(p, Role.SWAT);
+                profile.setRole(Role.SWAT);
                 p.sendMessage("RELOAD: Restored SWATs");
             }
             if (p.getDisplayName().contains("CRIMINAL")) {
-                PrisonGame.escaped.put(p, true);
+                profile.setEscaped(true);
                 p.addPotionEffect(PotionEffectType.GLOWING.createEffect(99999, 255));
                 p.sendMessage("RELOAD: Restored Criminals");
             }
             if (p.getDisplayName().contains("PRISONER")) {
-                PrisonGame.roles.put(p, Role.PRISONER);
+                profile.setRole(Role.PRISONER);
                 p.sendMessage("RELOAD: Restored Prisoner");
             }
         }
@@ -355,12 +345,6 @@ public final class PrisonGame extends JavaPlugin {
             p.removePotionEffect(PotionEffectType.WEAKNESS);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist off");
             p.sendTitle(ChatColor.GREEN + "Loaded!", "thanks for your patience!", 0, 40, 0);
-            PrisonGame.st.put(p, 0.0);
-            PrisonGame.sp.put(p, 0.0);
-            if (!PrisonGame.roles.containsKey(p)) {
-                PrisonGame.roles.put(p, Role.PRISONER);
-                MyListener.playerJoin(p, true);
-            }
 
             if (PrisonGame.warden != null) {
                 PrisonGame.warden.teleport(active.getWarden().getLocation());
@@ -418,7 +402,7 @@ public final class PrisonGame extends JavaPlugin {
     }
     public static void setNurse(Player g) {
         Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Guards").addPlayer(g);
-        PrisonGame.roles.put(g, Role.NURSE);
+        ProfileKt.getProfile(g).setRole(Role.NURSE);
         Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + g.getName() + " was promoted to a nurse!");
 
         g.setCustomName(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "NURSE" + ChatColor.GRAY + "] " + ChatColor.GRAY + g.getName());
@@ -482,8 +466,7 @@ public final class PrisonGame extends JavaPlugin {
         g.getInventory().addItem(card2);
 
         if (hardmode.get(g)) {
-            String prisonerNumber = "" + new Random().nextInt(100, 999);
-            PrisonGame.prisonnumber.put(g, prisonerNumber);
+            int prisonerNumber = ProfileKt.getProfile(g).getPrisonerNumber();
             PlayerDisguise playerDisguise = new PlayerDisguise("Hubertus1703" );
             playerDisguise.setName("NURSE " + prisonerNumber);
             playerDisguise.setKeepDisguiseOnPlayerDeath(true);
@@ -510,7 +493,7 @@ public final class PrisonGame extends JavaPlugin {
     }
     public static void setSwat(Player g) {
         Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Guards").addPlayer(g);
-        PrisonGame.roles.put(g, Role.SWAT);
+        ProfileKt.getProfile(g).setRole(Role.SWAT);
         Bukkit.broadcastMessage(ChatColor.DARK_GRAY + g.getName() + " was promoted to a SWAT member!");
 
         g.setCustomName(ChatColor.GRAY + "[" + ChatColor.DARK_GRAY + "SWAT" + ChatColor.GRAY + "] " + ChatColor.GRAY + g.getName());
@@ -560,8 +543,7 @@ public final class PrisonGame extends JavaPlugin {
         g.getInventory().addItem(card);
 
         if (hardmode.get(g)) {
-            String prisonerNumber = "" + new Random().nextInt(100, 999);
-            PrisonGame.prisonnumber.put(g, prisonerNumber);
+            int prisonerNumber = ProfileKt.getProfile(g).getPrisonerNumber();
             PlayerDisguise playerDisguise = new PlayerDisguise("Hubertus1703");
             playerDisguise.setName("SWAT " + prisonerNumber);
             playerDisguise.setKeepDisguiseOnPlayerDeath(true);
@@ -591,7 +573,7 @@ public final class PrisonGame extends JavaPlugin {
 
     public static void setGuard(Player g) {
         Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Guards").addPlayer(g);
-        PrisonGame.roles.put(g, Role.GUARD);
+        ProfileKt.getProfile(g).setRole(Role.GUARD);
         Bukkit.broadcastMessage(ChatColor.BLUE + g.getName() + " was promoted to a guard!");
 
         g.setCustomName(ChatColor.GRAY + "[" + ChatColor.BLUE + "GUARD" + ChatColor.GRAY + "] " + ChatColor.GRAY + g.getName());
@@ -650,8 +632,7 @@ public final class PrisonGame extends JavaPlugin {
         g.getInventory().addItem(card);
 
         if (hardmode.get(g)) {
-            String prisonerNumber = "" + new Random().nextInt(100, 999);
-            PrisonGame.prisonnumber.put(g, prisonerNumber);
+            int prisonerNumber = ProfileKt.getProfile(g).getPrisonerNumber();
             PlayerDisguise playerDisguise = new PlayerDisguise("Hubertus1703");
             playerDisguise.setName("GUARD " + prisonerNumber);
             playerDisguise.setKeepDisguiseOnPlayerDeath(true);
@@ -682,7 +663,7 @@ public final class PrisonGame extends JavaPlugin {
         var guardCount = 0;
 
         for (var player : Bukkit.getOnlinePlayers()) {
-            var role = PrisonGame.roles.get(player);
+            var role = ProfileKt.getProfile(player).getRole();
 
             if (role != Role.PRISONER && role != Role.WARDEN)
                 guardCount++;

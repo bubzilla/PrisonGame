@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class PassCommand implements CommandExecutor {
     @Override
@@ -36,7 +37,8 @@ public class PassCommand implements CommandExecutor {
                 return true;
             }
 
-            PrisonGame.askType.put(g, -1);
+            var profile = ProfileKt.getProfile(g);
+            profile.setRole(Role.WARDEN);
             sender.sendMessage(ChatColor.AQUA + "Succesfully asked player to be the warden!");
             g.sendMessage(ChatColor.RED + "The wardens wants you to be the warden! use '/accept'");
         }

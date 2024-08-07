@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.MyListener;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -44,8 +45,9 @@ public class ForceCommand implements CommandExecutor {
         }
 
         try {
+            var profile = ProfileKt.getProfile(player);
             var role = Role.valueOf(args[1].toUpperCase());
-            PrisonGame.roles.put(player, role);
+            profile.setRole(role);
 
             if (takeAction)
                 switch (role) {

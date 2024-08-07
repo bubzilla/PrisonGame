@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.util.Random;
 
@@ -33,6 +34,7 @@ public class MyListener implements Listener {
     }
 
     public static void playerJoinignoreAsc(Player p, Boolean dontresetshit) {
+            var profile = ProfileKt.getProfile(p);
             if (!dontresetshit) {
                 p.getOpenInventory().getTopInventory().clear();
                 p.getOpenInventory().getBottomInventory().clear();
@@ -40,7 +42,7 @@ public class MyListener implements Listener {
                 p.getInventory().clear();
             }
             if (!dontresetshit)
-                PrisonGame.escaped.put(p, false);
+                profile.setEscaped(false);
             p.playSound(p, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1, 0.75f);
 
             if (!dontresetshit) {
@@ -77,7 +79,7 @@ public class MyListener implements Listener {
                 p.getInventory().setBoots(orangeboot);
             }
             if (!dontresetshit) {
-                PrisonGame.roles.put(p, Role.PRISONER);
+                profile.setRole(Role.PRISONER);
             }
             Bukkit.getScheduler().runTaskLater(PrisonGame.getPlugin(PrisonGame.class), () -> {
                 p.teleport(PrisonGame.active.getPrisoner().getLocation());
@@ -88,8 +90,7 @@ public class MyListener implements Listener {
             if (!PrisonGame.hardmode.containsKey(p))
                 PrisonGame.hardmode.put(p, false);
             if (PrisonGame.hardmode.get(p)) {
-                String prisonerNumber = "" + new Random().nextInt(100, 999);
-                PrisonGame.prisonnumber.put(p, prisonerNumber);
+                int prisonerNumber = profile.getPrisonerNumber();
                 PlayerDisguise playerDisguise = new PlayerDisguise("pdlCAMERA");
                 playerDisguise.setName("Prisoner " + prisonerNumber);
                 playerDisguise.setKeepDisguiseOnPlayerDeath(true);

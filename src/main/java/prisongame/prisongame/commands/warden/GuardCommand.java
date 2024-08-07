@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class GuardCommand implements CommandExecutor {
     @Override
@@ -16,8 +17,9 @@ public class GuardCommand implements CommandExecutor {
         if (args.length >= 1) {
             if (Bukkit.getPlayer(args[0]) != null) {
                 Player g = Bukkit.getPlayer(args[0]);
-                if (g.isOnline() && g != sender && PrisonGame.roles.get(g) == Role.PRISONER) {
-                    PrisonGame.askType.put(g, 1);
+                var profile = ProfileKt.getProfile(g);
+                if (g.isOnline() && g != sender && profile.getRole() == Role.PRISONER) {
+                    profile.setInvite(Role.GUARD);
                     sender.sendMessage(ChatColor.AQUA + "Succesfully asked player to be a guard!");
                     g.sendMessage(ChatColor.BLUE + "The wardens wants you to be a guard! use '/accept'");
                 } else {

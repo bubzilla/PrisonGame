@@ -28,6 +28,7 @@ import prisongame.prisongame.commands.staff.VanishCommand;
 import prisongame.prisongame.keys.Keys;
 import prisongame.prisongame.lib.Role;
 import prisongame.prisongame.listeners.InventoryClickListener;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.text.DecimalFormat;
 
@@ -50,15 +51,13 @@ public class MyTask extends BukkitRunnable {
     public void run() {
         PrisonGame.solitcooldown = PrisonGame.solitcooldown - 1;
         for (Player p : Bukkit.getOnlinePlayers()) {
+            var profile = ProfileKt.getProfile(p);
             if (Keys.TRUST.get(p, 0.0) > 0) {
                 Keys.TRUST.set(p, 0.0);
             }
             DisguiseAPI.setActionBarShown(p, false);
             if (p.isSleeping()) {
                 p.setNoDamageTicks(10);
-            }
-            if (!PrisonGame.wealthcycle.containsKey(p)) {
-                PrisonGame.wealthcycle.put(p, Keys.MONEY.get(p));
             }
             if (!PrisonGame.wardentime.containsKey(p) || p != PrisonGame.warden) {
                 PrisonGame.wardentime.put(p, 0);
@@ -90,31 +89,8 @@ public class MyTask extends BukkitRunnable {
 //                    PrisonGame.wardentime.put(p, Integer.MIN_VALUE);
                 }
             }
-            if (!PrisonGame.saidcycle.containsKey(p)) {
-                PrisonGame.saidcycle.put(p, 0);
-            }
-            if (!PrisonGame.roles.containsKey(p)) {
-                PrisonGame.roles.put(p, Role.PRISONER);
-                MyListener.playerJoin(p, false);
-            }
-            if (!PrisonGame.st.containsKey(p)) {
-                PrisonGame.st.put(p, 0.0);
-            }
             if (!PrisonGame.hardmode.containsKey(p)) {
                 PrisonGame.hardmode.put(p, false);
-            }
-            if (!PrisonGame.sp.containsKey(p)) {
-                PrisonGame.sp.put(p, 0.0);
-            }
-            if (!PrisonGame.lastward.containsKey(p)) {
-                PrisonGame.lastward.put(p, 20 * 10);
-            }
-            PrisonGame.lastward.put(p, PrisonGame.lastward.get(p) + 1);
-            if (!PrisonGame.lastward2.containsKey(p)) {
-                PrisonGame.lastward2.put(p, 0);
-            }
-            if (!PrisonGame.wardenban.containsKey(p)) {
-                PrisonGame.wardenban.put(p, 0);
             }
             if (!PrisonGame.trustlevel.containsKey(p)) {
                 PrisonGame.trustlevel.put(p, 0);
@@ -129,21 +105,8 @@ public class MyTask extends BukkitRunnable {
                 p.removePotionEffect(PotionEffectType.WATER_BREATHING);
                 p.sendMessage( "You were released from solitary.");
             }
-            if (!PrisonGame.word.containsKey(p)) {
-                PrisonGame.word.put(p, "Amoger Susser");
-            }
-            if (PrisonGame.lastward.get(p) > 20 * 5) {
-                PrisonGame.lastward2.put(p, 0);
-            }
-
-            if (!PrisonGame.escaped.containsKey(p)) {
-                PrisonGame.escaped.put(p, false);
-            }
-            if (!PrisonGame.killior.containsKey(p) || p.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE) || PrisonGame.roles.get(p) != Role.PRISONER) {
+            if (!PrisonGame.killior.containsKey(p) || p.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE) || profile.getRole() != Role.PRISONER) {
                 PrisonGame.killior.put(p, null);
-            }
-            if (!PrisonGame.prisonnumber.containsKey(p)) {
-                PrisonGame.prisonnumber.put(p, "690");
             }
             if (!PrisonGame.respect.containsKey(p)) {
                 PrisonGame.respect.put(p, 0);
@@ -172,7 +135,7 @@ public class MyTask extends BukkitRunnable {
                 }
                 p.getInventory().remove(Material.IRON_BARS);
             }
-            if (PrisonGame.roles.get(p) != Role.PRISONER && PrisonGame.roles.get(p) != Role.WARDEN) {
+            if (profile.getRole() != Role.PRISONER && profile.getRole() != Role.WARDEN) {
                 if (p.hasPotionEffect(PotionEffectType.UNLUCK)) {
                     p.sendMessage(ChatColor.RED + "You can't be in here!");
                     p.playSound(p, Sound.ENTITY_PILLAGER_AMBIENT, 1.5f, 0.75f);
@@ -198,10 +161,10 @@ public class MyTask extends BukkitRunnable {
             Boolean allat = true;
             PrisonGame.gotcafefood.clear();
             for (Player p : Bukkit.getOnlinePlayers()) {
-
+                var profile = ProfileKt.getProfile(p);
                 p.removePotionEffect(PotionEffectType.BAD_OMEN);
                 p.getWorld().getWorldBorder().setWarningDistance(5);
-                if (PrisonGame.roles.get(p) != Role.PRISONER && PrisonGame.hardmode.get(p)) {
+                if (profile.getRole() != Role.PRISONER && PrisonGame.hardmode.get(p)) {
                     if (!new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() - 1, p.getLocation().getZ()).getBlock().getType().equals(Material.LIGHT_BLUE_CONCRETE_POWDER)) {
                         p.sendTitle("", ChatColor.BLUE + "GET ONTO LIGHT BLUE POWDER OR GET FIRED!", 0, 5, 0);
                         p.addPotionEffect(PotionEffectType.HUNGER.createEffect(200, 0));
@@ -221,7 +184,7 @@ public class MyTask extends BukkitRunnable {
 
                     }
                 }
-                if (PrisonGame.roles.get(p) == Role.PRISONER && !PrisonGame.escaped.get(p)) {
+                if (profile.getRole() == Role.PRISONER && !profile.getEscaped()) {
                     if (!new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() - 1, p.getLocation().getZ()).getBlock().getType().equals(Material.RED_SAND)) {
                         p.sendTitle("", ChatColor.RED + "GET ONTO THE RED SAND OR YOU'LL BE KILLED!", 0, 5, 0);
                         p.addPotionEffect(PotionEffectType.HUNGER.createEffect(200, 0));
@@ -231,7 +194,7 @@ public class MyTask extends BukkitRunnable {
                         p.removePotionEffect(PotionEffectType.JUMP);
                         Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals").addPlayer(p);
                     } else {
-                        if (PrisonGame.roles.get(p) == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
+                        if (profile.getRole() == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
                             Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Prisoners").addPlayer(p);
                         }
                         p.setHealth(p.getMaxHealth());
@@ -277,12 +240,14 @@ public class MyTask extends BukkitRunnable {
         if (Bukkit.getWorld("world").getTime() == 2000) {
             if (!hasAlerted) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                    var profile = ProfileKt.getProfile(p);
                     if (Keys.MONEY.has(p)) {
                         try {
-                            if (Keys.MONEY.get(p, 0.0) - PrisonGame.wealthcycle.get(p) >= 3000) {
+                            if (Keys.MONEY.get(p, 0.0) - profile.getStartOfDayMoney() >= 3000) {
                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only prison:wealthy");
                             }
-                            PrisonGame.wealthcycle.put(p, Keys.MONEY.get(p));
+                            
+                            profile.setStartOfDayMoney(Keys.MONEY.get(p, 0.0));
                         } catch (NullPointerException ignored) {
                             Bukkit.getLogger().info(p.getName() + " seems to not have a money container?");
                         }
@@ -292,24 +257,25 @@ public class MyTask extends BukkitRunnable {
                 Double taxcount = 0.0;
                 DecimalFormat numberFormat = new DecimalFormat("#0.0");
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.hasPotionEffect(PotionEffectType.GLOWING) && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER) {
+                    var profile = ProfileKt.getProfile(p);
+                    if (p.hasPotionEffect(PotionEffectType.GLOWING) && !profile.getEscaped() && profile.getRole() == Role.PRISONER) {
                         Bukkit.broadcastMessage(ChatColor.RED + p.getName() + ChatColor.GOLD + " didn't come to roll call! " + ChatColor.RED + "Kill them for 100 dollars!");
                         p.sendTitle("", ChatColor.RED + "COME TO ROLL CALL NEXT TIME!", 0, 60, 0);
                         if (PrisonGame.hardmode.get(p)) {
                             p.damage(99999);
-                            if (PrisonGame.roles.get(p) != Role.PRISONER) {
+                            if (profile.getRole() != Role.PRISONER) {
                                 if (PrisonGame.warden != null) {
                                     if (PrisonGame.warden.equals(p)) {
                                         PrisonGame.warden = null;
                                     }
                                 }
-                                PrisonGame.roles.put((Player) p, Role.PRISONER);
+                                profile.setRole(Role.PRISONER);
                                 MyListener.playerJoin((Player) p, false);
                             }
                         }
                         p.playSound(p, Sound.ENTITY_SILVERFISH_AMBIENT, 1, 0.25f);
                     }
-                    if (!p.hasPotionEffect(PotionEffectType.GLOWING) && !PrisonGame.escaped.get(p) && PrisonGame.respect.get(p) == 1) {
+                    if (!p.hasPotionEffect(PotionEffectType.GLOWING) && !profile.getEscaped() && PrisonGame.respect.get(p) == 1) {
                         PrisonGame.respect.put(p, 0);
                         PrisonGame.calls.put(p, PrisonGame.calls.getOrDefault(p, 0) + 1);
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only prison:respect");
@@ -322,7 +288,8 @@ public class MyTask extends BukkitRunnable {
             timer2 = 4000;
             bossbar.setTitle("Breakfast");
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!PrisonGame.hardmode.get(p) && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER)
+                var profile = ProfileKt.getProfile(p);
+                if (!PrisonGame.hardmode.get(p) && !profile.getEscaped() && profile.getRole() == Role.PRISONER)
                     p.addPotionEffect(PotionEffectType.SATURATION.createEffect(120, 0));
             }
         }
@@ -344,7 +311,8 @@ public class MyTask extends BukkitRunnable {
             bossbar.setTitle("Lunch");
             jobm = 1;
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!PrisonGame.hardmode.get(p) && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER)
+                var profile = ProfileKt.getProfile(p);
+                if (!PrisonGame.hardmode.get(p) && !profile.getEscaped() && profile.getRole() == Role.PRISONER)
                     p.addPotionEffect(PotionEffectType.SATURATION.createEffect(120, 0));
             }
         }
@@ -361,24 +329,25 @@ public class MyTask extends BukkitRunnable {
                 Double taxcount = 0.0;
                 DecimalFormat numberFormat = new DecimalFormat("#0.0");
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.hasPotionEffect(PotionEffectType.GLOWING) && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER) {
+                    var profile = ProfileKt.getProfile(p);
+                    if (p.hasPotionEffect(PotionEffectType.GLOWING) && !profile.getEscaped() && profile.getRole() == Role.PRISONER) {
                         Bukkit.broadcastMessage(ChatColor.RED + p.getName() + ChatColor.GOLD + " didn't come to roll call! " + ChatColor.RED + "Kill them for 100 dollars!");
                         p.sendTitle("", ChatColor.RED + "COME TO ROLL CALL NEXT TIME!", 0, 60, 0);
                         if (PrisonGame.hardmode.get(p)) {
                             p.damage(99999);
-                            if (PrisonGame.roles.get(p) != Role.PRISONER) {
+                            if (profile.getRole() != Role.PRISONER) {
                                 if (PrisonGame.warden != null) {
                                     if (PrisonGame.warden.equals(p)) {
                                         PrisonGame.warden = null;
                                     }
                                 }
-                                PrisonGame.roles.put((Player) p, Role.PRISONER);
+                                profile.setRole(Role.PRISONER);
                                 MyListener.playerJoin((Player) p, false);
                             }
                         }
                         p.playSound(p, Sound.ENTITY_SILVERFISH_AMBIENT, 1, 0.25f);
                     }
-                    if (!p.hasPotionEffect(PotionEffectType.GLOWING) && !PrisonGame.escaped.get(p) && PrisonGame.respect.get(p) == 1) {
+                    if (!p.hasPotionEffect(PotionEffectType.GLOWING) && !profile.getEscaped() && PrisonGame.respect.get(p) == 1) {
                         PrisonGame.respect.put(p, 0);
                         PrisonGame.calls.put(p, PrisonGame.calls.getOrDefault(p, 0) + 1);
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only prison:respect");
@@ -619,6 +588,7 @@ public class MyTask extends BukkitRunnable {
             timer2 = 24000;
             bossbar.setTitle("LIGHTS OUT");
             for (Player p : Bukkit.getOnlinePlayers()) {
+                var profile = ProfileKt.getProfile(p);
                 if (PrisonGame.hardmode.get(p)) {
                     if (p.hasPotionEffect(PotionEffectType.LUCK)) {
                         p.addPotionEffect(PotionEffectType.LUCK.createEffect(20 * 15, 0));
@@ -626,7 +596,7 @@ public class MyTask extends BukkitRunnable {
                         p.sendTitle("", ChatColor.RED + "You will be respawned at roll call!", 0, 20 * 3, 0);
                     }
                 }
-                if (PrisonGame.roles.get(p) == Role.PRISONER && !PrisonGame.escaped.get(p)) {
+                if (profile.getRole() == Role.PRISONER && !profile.getEscaped()) {
                     p.addPotionEffect(PotionEffectType.SATURATION.createEffect(20, 3));
                     p.getWorld().getWorldBorder().setWarningDistance(Integer.MAX_VALUE);
                     if (p.getWorld().getName().equals("endprison")) {
@@ -643,7 +613,7 @@ public class MyTask extends BukkitRunnable {
                                 Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals").addPlayer(p);
                             } else {
                                 Bukkit.getWorld("world").setTime(Bukkit.getWorld("world").getTime() + 2);
-                                if (PrisonGame.roles.get(p) == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
+                                if (profile.getRole() == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
                                     Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Prisoners").addPlayer(p);
                                 }
                                 p.removePotionEffect(PotionEffectType.HUNGER);
@@ -666,7 +636,7 @@ public class MyTask extends BukkitRunnable {
                             } else {
                                 PrisonGame.respect.put(p, 1);
                                 Bukkit.getWorld("world").setTime(Bukkit.getWorld("world").getTime() + 2);
-                                if (PrisonGame.roles.get(p) == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
+                                if (profile.getRole() == Role.PRISONER && Bukkit.getScoreboardManager().getMainScoreboard().getPlayerTeam(p) == Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Criminals")) {
                                     Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Prisoners").addPlayer(p);
                                 }
                                 p.removePotionEffect(PotionEffectType.HUNGER);
@@ -696,7 +666,8 @@ public class MyTask extends BukkitRunnable {
             bossbar.setTitle(bossbar.getTitle() + ChatColor.GREEN + " Power: " + PrisonGame.BBpower);
             if (Bukkit.getWorld("world").getBlockAt(new Location(Bukkit.getWorld("world"),-1023,-57,-994)).getType().equals(Material.AIR)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (PrisonGame.roles.get(p).equals(Role.PRISONER)) {
+                    var profile = ProfileKt.getProfile(p);
+                    if (profile.getRole() == Role.PRISONER) {
                         p.addPotionEffect(PotionEffectType.SPEED.createEffect(20*5,0));
                     }
                 }
@@ -745,7 +716,8 @@ public class MyTask extends BukkitRunnable {
         var prisoners = Component.empty();
 
         for (var player : Bukkit.getOnlinePlayers()) {
-            var role = PrisonGame.roles.get(player);
+            var profile = ProfileKt.getProfile(player);
+            var role = profile.getRole();
 
             switch (role) {
                 case NURSE, GUARD, SWAT -> {
@@ -838,6 +810,7 @@ public class MyTask extends BukkitRunnable {
             }
         }
         for (Player p : Bukkit.getOnlinePlayers()) {
+            var profile = ProfileKt.getProfile(p);
             if (PrisonGame.calls.getOrDefault(p, 0) >= 10) {
                 PrisonGame.calls.put(p, Integer.MIN_VALUE);
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + p.getName() + " only prison:npc");
@@ -896,7 +869,7 @@ public class MyTask extends BukkitRunnable {
                 p.setDisplayName(ChatColor.GRAY + "[" + ChatColor.GOLD + "SUPPORTER" + ChatColor.GRAY + "] " + p.getDisplayName());
             }*/
             if (PrisonGame.hardmode.get(p)) {
-                if (p.isSprinting() && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER) {
+                if (p.isSprinting() && !profile.getEscaped() && profile.getRole() == Role.PRISONER) {
                     p.setFoodLevel(p.getFoodLevel() - 1);
                     p.sendTitle("", ChatColor.RED + "You can only sprint when you've escaped! [HARD MODE]", 0, 5, 0);
                 }
@@ -946,7 +919,7 @@ public class MyTask extends BukkitRunnable {
             }
 
             if (PrisonGame.prisonerlevel.getOrDefault(p, 0) == 1) {
-                if (p.isSprinting() && !PrisonGame.escaped.get(p) && PrisonGame.roles.get(p) == Role.PRISONER) {
+                if (p.isSprinting() && !profile.getEscaped() && profile.getRole() == Role.PRISONER) {
                     p.setFoodLevel(p.getFoodLevel() - 1);
                     p.sendTitle("", ChatColor.RED + "You can only sprint when you've escaped! [F-CLASS]", 0, 5, 0);
                 }
@@ -1010,14 +983,14 @@ public class MyTask extends BukkitRunnable {
             }
             if (p.getInventory().getItemInMainHand().hasItemMeta()) {
                 if (p.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals(ChatColor.BLUE + "Handcuffs " + ChatColor.RED + "[CONTRABAND]")) {
-                    if (PrisonGame.roles.get(p) == Role.PRISONER) {
+                    if (profile.getRole() == Role.PRISONER) {
                         p.getInventory().remove(p.getInventory().getItemInMainHand());
                     }
                 }
             }
             if (p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.DAMAGE_ALL)) {
                 if (p.getInventory().getItemInMainHand().getType().equals(Material.DIAMOND_SWORD)) {
-                    if (PrisonGame.roles.get(p) != Role.WARDEN) {
+                    if (profile.getRole() != Role.WARDEN) {
                         p.sendMessage("no illegal 4 u!");
                         p.getInventory().getItemInMainHand().removeEnchantment(Enchantment.DAMAGE_ALL);
                         p.kickPlayer("");
@@ -1026,7 +999,7 @@ public class MyTask extends BukkitRunnable {
                 }
             }
             if (p.getLocation().getBlock().getType().equals(Material.VOID_AIR)) {
-                if (PrisonGame.roles.get(p).equals(0)) {
+                if (profile.getRole() == Role.PRISONER) {
                     if (!p.hasPotionEffect(PotionEffectType.GLOWING)) {
                         Boolean yesdothat = true;
                         if (p.getInventory().getChestplate() != null) {
@@ -1049,7 +1022,7 @@ public class MyTask extends BukkitRunnable {
                                                 p.addPotionEffect(PotionEffectType.DARKNESS.createEffect(20 * 6, 0));
                                             }
                                             for (Player g : Bukkit.getOnlinePlayers()) {
-                                                if (PrisonGame.roles.get(g) != Role.PRISONER) {
+                                                if (profile.getRole() != Role.PRISONER) {
                                                     g.playSound(g, Sound.ENTITY_SILVERFISH_DEATH, 1, 0.5f);
                                                     g.sendMessage(ChatColor.RED + p.getName() + ChatColor.DARK_RED + " was caught with contraband!");
                                                 }
@@ -1063,7 +1036,7 @@ public class MyTask extends BukkitRunnable {
                     }
                 }
             }
-            if (PrisonGame.roles.get(p) == Role.NURSE) {
+            if (profile.getRole() == Role.NURSE) {
                 if (!p.getInventory().contains(Material.SPLASH_POTION)) {
                     ItemStack pot = new ItemStack(Material.SPLASH_POTION);
                     PotionMeta potionMeta = (PotionMeta) pot.getItemMeta();
@@ -1096,9 +1069,10 @@ public class MyTask extends BukkitRunnable {
                 PrisonGame.warden = null;
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
+                var profile = ProfileKt.getProfile(p);
                 if (!p.getDisplayName().contains("ASCENDING") || !p.getGameMode().equals(GameMode.SPECTATOR)) {
                     if (p != PrisonGame.warden) {
-                        Role role = PrisonGame.roles.get(p);
+                        Role role = profile.getRole();
                         String acbar = "";
                         if (p.getDisplayName().contains("SOLITARY"))
                             acbar = "||" + ChatColor.DARK_GRAY + " SOLITARY [ " + numberFormat.format(PrisonGame.solittime.get(p) / 20) + " seconds left. ]";

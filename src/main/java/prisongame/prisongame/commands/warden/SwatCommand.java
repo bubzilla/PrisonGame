@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.PrisonGame;
+import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class SwatCommand implements CommandExecutor {
     @Override
@@ -17,8 +19,9 @@ public class SwatCommand implements CommandExecutor {
                 if (Bukkit.getPlayer(args[0]) != null) {
                     Player g = Bukkit.getPlayer(args[0]);
                     if (g.isOnline() && g != sender) {
-                        PrisonGame.askType.put(g, 3);
-                        sender.sendMessage(ChatColor.DARK_GRAY + "Succesfully asked player to be a guard!");
+                        var profile = ProfileKt.getProfile(g);
+                        profile.setInvite(Role.SWAT);
+                        sender.sendMessage(ChatColor.DARK_GRAY + "Succesfully asked player to be a SWAT guard!");
                         g.sendMessage(ChatColor.DARK_GRAY + "The wardens wants you to be a SWAT guard! use '/accept'");
                     } else {
                         sender.sendMessage(ChatColor.BLUE + "We had troubles promoting this player. If they're a guard/nurse, demote them, then promote them  to swat again!");

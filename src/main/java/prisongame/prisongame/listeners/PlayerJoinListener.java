@@ -18,6 +18,7 @@ import prisongame.prisongame.commands.danger.staff.SeasonCommand;
 import prisongame.prisongame.commands.staff.VanishCommand;
 import prisongame.prisongame.discord.listeners.Messages;
 import prisongame.prisongame.keys.Keys;
+import prisongame.prisongame.profile.ProfileKt;
 
 import java.io.IOException;
 
@@ -100,14 +101,15 @@ public class PlayerJoinListener implements Listener {
 
         if (PrisonGame.wardenenabled) {
             Player p = event.getPlayer();
+            var profile = ProfileKt.getProfile(p);
             PrisonGame.trustlevel.put(event.getPlayer(), 0);
             DisguiseAPI.undisguiseToAll(event.getPlayer());
             event.getPlayer().removePotionEffect(PotionEffectType.DARKNESS);
             event.getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
             event.setJoinMessage(ChatColor.GOLD + event.getPlayer().getName() + " was caught and sent to prison! (JOIN)");
             event.getPlayer().setGameMode(GameMode.ADVENTURE);
-            PrisonGame.st.put(event.getPlayer(), 0.0);
-            PrisonGame.sp.put(event.getPlayer(), 0.0);
+            profile.setStrength(0.0);
+            profile.setSpeed(0.0);
             playerJoin(event.getPlayer(), false);
             if (event.getPlayer().hasPotionEffect(PotionEffectType.WATER_BREATHING)) {
                 Player g = event.getPlayer();
@@ -115,7 +117,7 @@ public class PlayerJoinListener implements Listener {
                 g.setGameMode(GameMode.ADVENTURE);
                 g.removePotionEffect(PotionEffectType.LUCK);
                 PrisonGame.solittime.put(g, 20 * 120);
-                PrisonGame.escaped.put(g, true);
+                profile.setEscaped(true);
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + g.getName() + " only prison:solit");
                 Bukkit.getScheduler().runTaskLater(PrisonGame.getPlugin(PrisonGame.class), () -> {
                     g.teleport(PrisonGame.active.getSolitary().getLocation());

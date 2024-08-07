@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.lib.Role;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class SolitaryCommand implements CommandExecutor {
     @Override
@@ -26,7 +27,8 @@ public class SolitaryCommand implements CommandExecutor {
                 }
                 if (solitcount < 3) {
                     if (PrisonGame.solitcooldown <= 0) {
-                        if (g.isOnline() && g != sender && PrisonGame.roles.get(g) == Role.PRISONER) {
+                        var profile = ProfileKt.getProfile(g);
+                        if (g.isOnline() && g != sender && profile.getRole() == Role.PRISONER) {
                             if (g.isDead())
                                 g.spigot().respawn();
                             if (g.getGameMode() == GameMode.SPECTATOR) {
@@ -34,7 +36,7 @@ public class SolitaryCommand implements CommandExecutor {
                                 Bukkit.broadcastMessage(ChatColor.GRAY + g.getName() + " was sent to solitary!");
                                 g.setGameMode(GameMode.ADVENTURE);
                                 g.removePotionEffect(PotionEffectType.LUCK);
-                                PrisonGame.escaped.put(g, true);
+                                profile.setEscaped(true);
                                 PrisonGame.solittime.put(g, 20 * 120);
                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement grant " + g.getName() + " only prison:solit");
                                 Bukkit.getScheduler().runTaskLater(PrisonGame.getPlugin(PrisonGame.class), () -> {

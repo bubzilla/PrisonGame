@@ -13,8 +13,7 @@ import prisongame.prisongame.MyListener;
 import prisongame.prisongame.PrisonGame;
 import prisongame.prisongame.keys.Keys;
 import prisongame.prisongame.lib.Role;
-
-import java.util.Random;
+import prisongame.prisongame.profile.ProfileKt;
 
 public class HardCommand implements CommandExecutor {
 
@@ -23,6 +22,7 @@ public class HardCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && !PrisonGame.hardmode.get((Player) sender)) {
             Player pe = (Player) sender;
+            var profile = ProfileKt.getProfile(pe);
             if (!((Player) sender).getDisplayName().contains("SOLITARY") && !((Player) sender).hasCooldown(Material.IRON_DOOR) && !new Location(pe.getWorld(), pe.getLocation().getX(), pe.getLocation().getY() - 1, pe.getLocation().getZ()).getBlock().getType().equals(Material.RED_SAND)) {
                 Player p = (Player) sender;
                 p.setViewDistance(2);
@@ -33,11 +33,10 @@ public class HardCommand implements CommandExecutor {
                         PrisonGame.warden = null;
                     }
                 }
-                PrisonGame.roles.put((Player) sender, Role.PRISONER);
+                profile.setRole(Role.PRISONER);
                 PrisonGame.hardmode.put(p, true);
                 MyListener.playerJoin(p, false);
-                String prisonerNumber = "" + new Random().nextInt(100, 999);
-                PrisonGame.prisonnumber.put(p, prisonerNumber);
+                var prisonerNumber = profile.getPrisonerNumber();
                 PlayerDisguise playerDisguise = new PlayerDisguise("pdlCAMERA");
                 playerDisguise.setName("Prisoner " + prisonerNumber);
                 playerDisguise.setKeepDisguiseOnPlayerDeath(true);
